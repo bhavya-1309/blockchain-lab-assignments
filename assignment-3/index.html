@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Blockchain Transaction with MetaMask</title>
+
+    <style>
+      body {
+        font-family: Arial;
+        background: #f4f4f4;
+        text-align: center;
+        padding: 40px;
+      }
+
+      .container {
+        background: white;
+        padding: 30px;
+        width: 400px;
+        margin: auto;
+        border-radius: 10px;
+        box-shadow: 0px 0px 10px gray;
+      }
+
+      input {
+        width: 90%;
+        padding: 10px;
+        margin: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        background: #ff9800;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #e68900;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h2>MetaMask Product Transaction</h2>
+
+      <button onclick="connectWallet()">Connect Wallet</button>
+
+      <p id="walletAddress"></p>
+
+      <h3>Send Transaction</h3>
+
+      <input type="text" id="receiver" placeholder="Receiver Wallet Address" />
+
+      <input type="number" id="amount" placeholder="Amount in ETH" />
+
+      <button onclick="sendTransaction()">Send Transaction</button>
+
+      <p id="status"></p>
+    </div>
+
+    <script>
+      let account;
+
+      async function connectWallet() {
+        if (window.ethereum) {
+          try {
+            const accounts = await ethereum.request({
+              method: "eth_requestAccounts",
+            });
+
+            account = accounts[0];
+
+            document.getElementById("walletAddress").innerText =
+              "Connected Wallet: " + account;
+          } catch (error) {
+            console.log(error);
+          }
+        } else {
+          alert("MetaMask not installed");
+        }
+      }
+
+      async function sendTransaction() {
+        const receiver = document.getElementById("receiver").value;
+        const amount = document.getElementById("amount").value;
+
+        if (!receiver || !amount) {
+          alert("Please fill all fields");
+          return;
+        }
+
+        const transactionParameters = {
+          to: receiver,
+
+          from: account,
+
+          value: "0x" + (amount * 1e18).toString(16),
+        };
+
+        try {
+          const txHash = await ethereum.request({
+            method: "eth_sendTransaction",
+
+            params: [transactionParameters],
+          });
+
+          document.getElementById("status").innerText =
+            "Transaction Sent! Hash: " + txHash;
+        } catch (error) {
+          document.getElementById("status").innerText = "Transaction Failed";
+
+          console.log(error);
+        }
+      }
+    </script>
+  </body>
+</html>
